@@ -152,38 +152,128 @@ class Vtiger_DependencyPicklist {
 	static function getPicklistDependencyDatasource($module) {
 		global $adb;
 
-		$tabId = getTabid($module);
 
-		$result = $adb->pquery('SELECT * FROM vtiger_picklist_dependency WHERE tabid=?', array($tabId));
-		$noofrows = $adb->num_rows($result);
+        $xml2 = "<?xml version=\"1.0\"?> 
+     <map>
+    <origin>
+        <name>Campaigns</name>
+    </origin>
+    <roles>
+    <role>CEO</role>
+    </roles>
+    <dependencies>
+        <dependency>
+           <name>startdate</name>
+            <conditions>
+                <condition>
+                    <operator>haschanged</operator>
+                    <values></values>
+                </condition>
+            </conditions>
+            <targets>
+                <change>
+                    <field>enddate</field>
+                    <corebos_expression>add_days('startdate',60)</corebos_expression>
+                </change>
+            </targets>
+        </dependency>
+        <dependency>
+            <conditions>
+                <condition>
+                    <module>Campaigns</module>
+                    <fields>
+                        <field>campaignname</field>
+                    </fields>
+                    <action>contains</action>
+                    <values>
+                        <value>ad</value>
+                        <value>ia</value>
+                    </values>
+                </condition>  
+                   <condition>
+                    <module>Campaigns</module>
+                    <fields>
+                        <field>campaign_no</field>
+                    </fields>
+                    <action>contains</action>
+                    <values>
+                        <value>ad</value>
+                        <value>ia</value>
+                        <value>ia2</value>
+                        <value>CA</value>
+                    </values>
+                </condition> 
+                <condition>
+                    <module>Campaigns</module>
+                    <fields>
+                        <field>product_name</field>
+                    </fields>
+                    <action>empty</action>
+                </condition> 
+                
+                <condition>
+                    <module>Campaigns</module>
+                    <fields>
+                        <field>expectedroi</field>
+                    </fields>
+                    <action>greater</action>
+                    <values>
+                        <value>2</value>
+                    </values>
+                </condition> 
+                <condition>
+                    <module>Campaigns</module>
+                    <fields>
+                        <field>numsent</field>
+                    </fields>
+                    <action>lesser</action>
+                    <values>
+                        <value>5</value>
+                    </values>
+                </condition> 
+                <condition>
+                    <module>Campaigns</module>
+                    <fields>
+                        <field>targetsize</field>
+                    </fields>
+                    <action>equals</action>
+                    <values>
+                        <value>15926</value>
+                    </values>
+                </condition> 
+            </conditions>
+            <targets>
+                <change>
+                <field>sponsor</field>
+                <value>Sponzori</value>  
+                <field>campaignname</field>
+                <value>2323232</value>
+                </change>
+                <hide>
+                <field>targetaudience</field>
+                </hide>
+                <readonly>
+                <field>campaignname</field>
+                </readonly>
+                <collapse>
+                </collapse>
+            </targets>
+        </dependency>
+        
+        
+        
+        
+        
+    </dependencies>
+</map>";
 
-		$picklistDependencyDatasource = array();
-		for($i=0; $i<$noofrows; ++$i) {
-			$sourceField = $adb->query_result($result, $i, 'sourcefield');
-			$targetField = $adb->query_result($result, $i, 'targetfield');
-			$sourceValue = decode_html($adb->query_result($result, $i, 'sourcevalue'));
-			$targetValues = decode_html($adb->query_result($result, $i, 'targetvalues'));
-			$unserializedTargetValues = json_decode(html_entity_decode($targetValues),true);
-			$criteria = decode_html($adb->query_result($result, $i, 'criteria'));
-			$unserializedCriteria = json_decode(html_entity_decode($criteria),true);
 
-			if(!empty($unserializedCriteria) && $unserializedCriteria['fieldname'] != null) {
-				$conditionValue = array(
-						"condition" => array($unserializedCriteria['fieldname'] => $unserializedCriteria['fieldvalues']),
-						"values" => $unserializedTargetValues
-				);
-				$picklistDependencyDatasource[$sourceField][$sourceValue][$targetField][] = $conditionValue;
-			} else {
-				$picklistDependencyDatasource[$sourceField][$sourceValue][$targetField] = $unserializedTargetValues;
-			}
-			if(empty($picklistDependencyDatasource[$sourceField]['__DEFAULT__'][$targetField])) {
-				foreach(getAllPicklistValues($targetField) as $picklistValue) {
-					$pickArray[] = decode_html($picklistValue);
-				}
-				$picklistDependencyDatasource[$sourceField]['__DEFAULT__'][$targetField] = $pickArray;
-			}
-		}
-		return $picklistDependencyDatasource;
+
+        $ob = simplexml_load_string($xml2);
+        $json = json_encode($ob);
+
+
+        return $json;
 	}
 
 	static function getJSPicklistDependencyDatasource($module) {

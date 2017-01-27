@@ -160,4 +160,10 @@ $smarty->assign('FIELDHELPINFO', vtlib_getFieldHelpInfo($currentModule));
 
 $picklistDependencyDatasource = Vtiger_DependencyPicklist::getPicklistDependencyDatasource($currentModule);
 $smarty->assign("PICKIST_DEPENDENCY_DATASOURCE", json_encode($picklistDependencyDatasource));
+
+
+$result = $adb->pquery("SELECT rolename FROM vtiger_role WHERE roleid = ?",array($current_user->roleid));
+$role = $adb->query_result($result,0,'rolename');
+
+$smarty->assign("USER_ROLE", $role);
 ?>
