@@ -162,21 +162,7 @@ class Vtiger_DependencyPicklist {
     <role>CEO</role>
     </roles>
     <dependencies>
-        <dependency>
-           <name>startdate</name>
-            <conditions>
-                <condition>
-                    <operator>haschanged</operator>
-                    <values></values>
-                </condition>
-            </conditions>
-            <targets>
-                <change>
-                    <field>enddate</field>
-                    <corebos_expression>add_days('startdate',60)</corebos_expression>
-                </change>
-            </targets>
-        </dependency>
+    
         <dependency>
             <conditions>
                 <condition>
